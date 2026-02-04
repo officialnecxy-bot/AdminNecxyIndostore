@@ -1,0 +1,1925 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NECXY PRO | ELITE ADMIN CONSOLE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { 
+                        primary: '#FF003C', 
+                        dark: '#050505', 
+                        card: '#0F0F0F',
+                        accent: '#22C55E',
+                        indo: '#833ab4',
+                        method: '#ff5e62',
+                        cc: '#11998e',
+                        bin: '#2193b0',
+                        paynow: '#654ea3'
+                    },
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    animation: {
+                        'slide-in': 'slideIn 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        slideIn: {
+                            '0%': { transform: 'translateX(100%)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #000; color: #e5e5e5; font-family: 'Outfit', sans-serif; overflow: hidden; height: 100vh; }
+        .sidebar-glass { background: #050505; border-right: 1px solid rgba(255,255,255,0.05); transition: 0.4s; }
+        .content-glass { background: rgba(15, 15, 15, 0.7); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .nav-item { display: flex; align-items: center; gap: 14px; padding: 16px 24px; color: #777; border-radius: 16px; transition: 0.4s; margin-bottom: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+        .nav-item:hover { color: #fff; background: rgba(255,255,255,0.03); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(255,0,60,0.12), transparent); color: #FF003C; border-left: 4px solid #FF003C; }
+        .input-dark { background: #000; border: 1px solid #1a1a1a; color: white; padding: 12px 16px; border-radius: 16px; width: 100%; outline: none; transition: 0.3s; font-size: 0.8rem; }
+        .input-dark:focus { border-color: #FF003C; box-shadow: 0 0 20px rgba(255,0,60,0.1); }
+        
+        .switch { position: relative; display: inline-block; width: 48px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #FF003C; }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF003C; }
+
+        .neo-card { transition: 0.4s; border: 1px solid rgba(255,255,255,0.05); position: relative; overflow: hidden; }
+        .neo-card:hover { transform: translateY(-3px); border-color: rgba(255,0,60,0.2); background: rgba(255,255,255,0.02); }
+
+        @media (max-width: 768px) {
+            .sidebar-mobile-hidden { transform: translateX(-100%); position: fixed; height: 100vh; z-index: 1000; }
+            .sidebar-mobile-show { transform: translateX(0); position: fixed; height: 100vh; z-index: 1000; }
+        }
+        
+        /* COMPACT PRODUCT GRID */
+        .compact-product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .compact-product-card {
+            background: rgba(15, 15, 15, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 18px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .compact-product-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .compact-product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .compact-product-card[data-type="indo"]::before { background: linear-gradient(90deg, #833ab4, #fd1d1d, #fcb045); }
+        .compact-product-card[data-type="cc"]::before { background: linear-gradient(90deg, #11998e, #38ef7d); }
+        .compact-product-card[data-type="method"]::before { background: linear-gradient(90deg, #ff5e62, #ff9966); }
+        .compact-product-card[data-type="bin"]::before { background: linear-gradient(90deg, #2193b0, #6dd5ed); }
+        .compact-product-card[data-type="paynow"]::before { background: linear-gradient(90deg, #654ea3, #eaafc8); }
+        .compact-product-card[data-type="other"]::before { background: linear-gradient(90deg, #8e2de2, #4a00e0); }
+        
+        .category-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            align-self: flex-start;
+        }
+        
+        .tag-indo { background: rgba(131, 58, 180, 0.15); color: #ff6b9d; border: 1px solid rgba(131, 58, 180, 0.3); }
+        .tag-cc { background: rgba(17, 153, 142, 0.15); color: #4ade80; border: 1px solid rgba(17, 153, 142, 0.3); }
+        .tag-method { background: rgba(255, 94, 98, 0.15); color: #ff9966; border: 1px solid rgba(255, 94, 98, 0.3); }
+        .tag-bin { background: rgba(33, 147, 176, 0.15); color: #6dd5ed; border: 1px solid rgba(33, 147, 176, 0.3); }
+        .tag-paynow { background: rgba(101, 78, 163, 0.15); color: #eaafc8; border: 1px solid rgba(101, 78, 163, 0.3); }
+        .tag-other { background: rgba(142, 45, 226, 0.15); color: #a855f7; border: 1px solid rgba(142, 45, 226, 0.3); }
+        
+        /* Enhanced Login Styles */
+        .login-container {
+            background: linear-gradient(135deg, #000000 0%, #0a0a0a 50%, #111111 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+        }
+        
+        .login-card {
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 32px;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        
+        .login-header {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px 40px 20px;
+        }
+        
+        .login-body {
+            position: relative;
+            z-index: 1;
+            padding: 0 40px;
+        }
+        
+        .login-footer {
+            position: relative;
+            z-index: 1;
+            padding: 30px 40px 40px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .auth-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            padding: 4px;
+            margin-bottom: 30px;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #666;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .auth-tab.active {
+            background: linear-gradient(135deg, #FF003C 0%, #CC002F 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 0, 60, 0.3);
+        }
+        
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            margin-bottom: 6px;
+            padding-left: 10px;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 0 14px;
+            transition: all 0.3s;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: #FF003C;
+            box-shadow: 0 0 0 3px rgba(255, 0, 60, 0.1);
+        }
+        
+        .input-wrapper i {
+            color: #666;
+            font-size: 13px;
+            margin-right: 10px;
+            min-width: 14px;
+        }
+        
+        .input-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 16px 0;
+            font-size: 13px;
+            font-weight: 500;
+            outline: none;
+            width: 100%;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #FF003C 0%, #CC002F 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 0, 60, 0.3);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
+        .btn-green {
+            background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%) !important;
+        }
+        
+        .btn-green:hover {
+            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3) !important;
+        }
+        
+        .loader {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Enhanced Member Popup */
+        .member-popup-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+        
+        .member-info-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .member-info-label {
+            font-size: 8px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .member-info-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .member-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .badge-active { background: rgba(34, 197, 94, 0.1); color: #22C55E; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .badge-banned { background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .badge-premium { background: rgba(255, 0, 60, 0.1); color: #FF003C; border: 1px solid rgba(255, 0, 60, 0.2); }
+        
+        /* Product Category Boxes */
+        .category-boxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .category-box {
+            flex: 1;
+            min-width: 100px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .category-box:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+        
+        .category-box.active {
+            background: rgba(255, 0, 60, 0.1);
+            border-color: #FF003C;
+            box-shadow: 0 5px 15px rgba(255, 0, 60, 0.2);
+        }
+        
+        .category-box i {
+            font-size: 20px;
+            margin-bottom: 8px;
+            display: block;
+            transition: all 0.3s;
+        }
+        
+        .category-box span {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+        }
+        
+        /* Custom Icons for Categories */
+        .category-box[data-type="indo"] i { color: #833ab4; }
+        .category-box[data-type="cc"] i { color: #11998e; }
+        .category-box[data-type="method"] i { color: #ff5e62; }
+        .category-box[data-type="bin"] i { color: #2193b0; }
+        .category-box[data-type="paynow"] i { color: #654ea3; }
+        .category-box[data-type="other"] i { color: #8e2de2; }
+        
+        .category-box.active[data-type="indo"] i { color: #ff6b9d; }
+        .category-box.active[data-type="cc"] i { color: #4ade80; }
+        .category-box.active[data-type="method"] i { color: #ff9966; }
+        .category-box.active[data-type="bin"] i { color: #6dd5ed; }
+        .category-box.active[data-type="paynow"] i { color: #eaafc8; }
+        .category-box.active[data-type="other"] i { color: #a855f7; }
+        
+        /* Compact Inventory Navbar */
+        .inventory-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow-x: auto;
+        }
+        
+        .inventory-nav-btn {
+            padding: 10px 16px;
+            border-radius: 14px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+        }
+        
+        .inventory-nav-btn:hover {
+            transform: translateY(-1px);
+        }
+        
+        .inventory-nav-btn.active {
+            border-color: currentColor;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .inventory-nav-btn i {
+            font-size: 12px;
+        }
+        
+        /* Category specific buttons */
+        .nav-btn-all { background: rgba(255, 255, 255, 0.05); color: white; }
+        .nav-btn-indo { background: rgba(131, 58, 180, 0.1); color: #833ab4; }
+        .nav-btn-cc { background: rgba(17, 153, 142, 0.1); color: #11998e; }
+        .nav-btn-method { background: rgba(255, 94, 98, 0.1); color: #ff5e62; }
+        .nav-btn-bin { background: rgba(33, 147, 176, 0.1); color: #2193b0; }
+        .nav-btn-paynow { background: rgba(101, 78, 163, 0.1); color: #654ea3; }
+        .nav-btn-other { background: rgba(142, 45, 226, 0.1); color: #8e2de2; }
+        
+        /* Deposit Delete Button */
+        .delete-deposit-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .delete-deposit-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        /* Admin Registration Secret */
+        .admin-secret-note {
+            font-size: 8px;
+            color: #666;
+            text-align: center;
+            margin-top: 12px;
+            font-style: italic;
+        }
+        
+        /* Custom Alert */
+        .custom-alert {
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .alert-content {
+            background: linear-gradient(135deg, #0a0a0a 0%, #050505 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 35px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .alert-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+        }
+        
+        .alert-danger { background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .alert-warning { background: rgba(234, 179, 8, 0.1); color: #EAB308; border: 1px solid rgba(234, 179, 8, 0.2); }
+        .alert-success { background: rgba(34, 197, 94, 0.1); color: #22C55E; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .alert-primary { background: rgba(255, 0, 60, 0.1); color: #FF003C; border: 1px solid rgba(255, 0, 60, 0.2); }
+        
+        /* Toast Styling */
+        .toast-success { border-left: 4px solid #22C55E; }
+        .toast-error { border-left: 4px solid #EF4444; }
+        .toast-warning { border-left: 4px solid #EAB308; }
+        .toast-info { border-left: 4px solid #3B82F6; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Toast Area -->
+    <div id="toast-area" class="fixed top-5 right-5 z-[8000] flex flex-col gap-2 max-w-sm"></div>
+
+    <!-- Custom Alert -->
+    <div id="custom-alert" class="custom-alert">
+        <div class="alert-content">
+            <div id="alert-icon" class="alert-icon alert-primary">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h3 id="alert-title" class="text-xl font-black uppercase text-white tracking-tighter mb-2">Confirm Action</h3>
+            <p id="alert-msg" class="text-[10px] text-gray-500 font-bold uppercase tracking-[0.1em] mb-6">Proceed with this administrative action?</p>
+            <div class="flex gap-3">
+                <button onclick="closeAlert()" class="flex-1 py-3 bg-white/5 rounded-xl font-black uppercase text-[9px] tracking-widest hover:bg-white/10 transition border border-white/5">Cancel</button>
+                <button id="alert-confirm-btn" class="flex-1 py-3 bg-primary rounded-xl font-black uppercase text-[9px] tracking-widest text-white shadow-xl shadow-red-500/20 hover:scale-105 transition">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="main-sidebar" class="w-72 sidebar-glass sidebar-mobile-hidden md:translate-x-0 flex flex-col h-full z-[1001]">
+        <div class="h-28 flex items-center justify-between px-10 border-b border-white/5">
+            <h1 class="text-2xl font-black text-white italic tracking-tighter">NECXY <span class="text-primary">PRO</span></h1>
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-500"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <nav class="flex-1 py-10 px-6 overflow-y-auto">
+            <div onclick="switchTab('dash')" id="nav-dash" class="nav-item active"><i class="fa-solid fa-layer-group"></i> Console</div>
+            <div onclick="switchTab('orders')" id="nav-orders" class="nav-item"><i class="fa-solid fa-receipt"></i> Sales History</div>
+            <div onclick="switchTab('products')" id="nav-products" class="nav-item"><i class="fa-solid fa-cubes"></i> Inventory</div>
+            <div onclick="switchTab('users')" id="nav-users" class="nav-item"><i class="fa-solid fa-users-viewfinder"></i> Member CRM</div>
+            <div onclick="switchTab('deposits')" id="nav-deposits" class="nav-item"><i class="fa-solid fa-money-bill-transfer"></i> Fund Requests</div>
+            <div onclick="switchTab('requests')" id="nav-requests" class="nav-item"><i class="fa-solid fa-comment-dots"></i> User Requests</div>
+            <div onclick="switchTab('settings')" id="nav-settings" class="nav-item"><i class="fa-solid fa-server"></i> System Config</div>
+        </nav>
+        <div class="p-8 border-t border-white/5">
+            <button onclick="confirmAction('Securely logout from the system?', logoutAdmin)" class="w-full py-3 rounded-xl bg-white/5 text-gray-400 hover:text-red-500 transition font-black text-[9px] uppercase tracking-widest">Sign Out</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 h-full overflow-y-auto bg-[#020202] p-4 md:p-10 relative">
+        <header class="md:hidden flex items-center justify-between mb-8">
+            <button onclick="toggleSidebar()" class="text-white bg-card p-4 rounded-xl border border-white/10"><i class="fa-solid fa-bars-staggered"></i></button>
+            <h1 class="text-lg font-black text-white italic">NECXY <span class="text-primary">PRO</span></h1>
+        </header>
+
+        <!-- Dashboard -->
+        <section id="page-dash" class="space-y-10 animate-fade-in">
+            <div class="flex justify-between items-end">
+                <div>
+                    <span class="text-primary font-black text-[9px] uppercase tracking-[0.4em] mb-2 block">Database Status: Active</span>
+                    <h2 class="text-4xl font-black uppercase text-white tracking-tighter">Admin <span class="text-primary">Panel</span></h2>
+                </div>
+                <div class="text-right hidden md:block">
+                    <p id="live-date" class="text-white font-black text-lg uppercase tracking-tighter">--/--/----</p>
+                    <p id="live-clock" class="text-primary font-bold text-[9px] tracking-[0.4em] uppercase mt-1">00:00:00 AM</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="content-glass p-8 rounded-[35px] neo-card">
+                    <p class="text-[9px] text-gray-500 uppercase font-black tracking-[0.2em] mb-3">Total Population</p>
+                    <h3 id="stat-users" class="text-5xl font-black text-white">0</h3>
+                </div>
+                <div class="content-glass p-8 rounded-[35px] neo-card border-b-4 border-green-500/30">
+                    <p class="text-[9px] text-gray-500 uppercase font-black tracking-[0.2em] mb-3">Global Capital</p>
+                    <h3 id="stat-balance" class="text-5xl font-black text-white">₹0</h3>
+                </div>
+                <div class="content-glass p-8 rounded-[35px] neo-card border-b-4 border-primary/30">
+                    <p class="text-[9px] text-gray-500 uppercase font-black tracking-[0.2em] mb-3">Action Required</p>
+                    <h3 id="stat-requests" class="text-5xl font-black text-primary">0</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Orders -->
+        <section id="page-orders" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h2 class="text-3xl font-black uppercase text-white tracking-tighter">Trade <span class="text-primary">Records</span></h2>
+                <button onclick="confirmAction('Execute global wipe of all sales data?', clearSalesHistory)" class="bg-red-600/10 text-red-500 border border-red-600/20 px-6 py-3 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition">Wipe Sales Log</button>
+            </div>
+            
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                <input type="text" id="search-orders" onkeyup="renderOrders()" placeholder="Search Name, UID, or Product..." class="input-dark pl-12">
+            </div>
+
+            <div id="orders-list" class="grid grid-cols-1 gap-4 pb-16"></div>
+        </section>
+
+        <!-- Products -->
+        <section id="page-products" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-3xl font-black uppercase text-white tracking-tighter">Vault <span class="text-primary">Assets</span></h2>
+                    <p class="text-[9px] text-gray-500 uppercase font-black tracking-[0.2em] mt-1">Dynamic Inventory Management</p>
+                </div>
+                <button onclick="openProductModal()" class="bg-primary text-white px-8 py-4 rounded-[18px] font-black text-[10px] uppercase tracking-widest shadow-2xl shadow-red-500/30 hover:scale-105 transition">
+                    <i class="fa-solid fa-plus mr-2"></i> New Asset
+                </button>
+            </div>
+
+            <!-- Inventory Navbar -->
+            <div class="inventory-nav">
+                <button onclick="filterProducts('all')" class="inventory-nav-btn nav-btn-all active">
+                    <i class="fa-solid fa-grid-2"></i> All Assets
+                </button>
+                <button onclick="filterProducts('indo')" class="inventory-nav-btn nav-btn-indo">
+                    <i class="fa-brands fa-instagram"></i> Indo
+                </button>
+                <button onclick="filterProducts('cc')" class="inventory-nav-btn nav-btn-cc">
+                    <i class="fa-solid fa-credit-card"></i> CC's
+                </button>
+                <button onclick="filterProducts('method')" class="inventory-nav-btn nav-btn-method">
+                    <i class="fa-solid fa-fire"></i> Method
+                </button>
+                <button onclick="filterProducts('bin')" class="inventory-nav-btn nav-btn-bin">
+                    <i class="fa-solid fa-microchip"></i> Bin
+                </button>
+                <button onclick="filterProducts('paynow')" class="inventory-nav-btn nav-btn-paynow">
+                    <i class="fa-solid fa-bolt"></i> Pay Now
+                </button>
+                <button onclick="filterProducts('other')" class="inventory-nav-btn nav-btn-other">
+                    <i class="fa-solid fa-box"></i> Other
+                </button>
+            </div>
+
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                <input type="text" id="search-products" onkeyup="renderProducts()" placeholder="Search assets by name, category, or description..." class="input-dark pl-12">
+            </div>
+            
+            <!-- COMPACT Product Grid Container -->
+            <div id="products-list" class="compact-product-grid"></div>
+        </section>
+
+        <!-- Users -->
+        <section id="page-users" class="hidden space-y-6">
+            <h2 class="text-3xl font-black uppercase text-white tracking-tighter">Member <span class="text-primary">Atlas</span></h2>
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                <input type="text" id="search-user" onkeyup="renderUsers()" placeholder="Search User via Name, Email or 6-digit UID..." class="input-dark pl-12">
+            </div>
+            <div id="users-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+        </section>
+
+        <!-- Deposits -->
+        <section id="page-deposits" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h2 class="text-3xl font-black uppercase text-white tracking-tighter">Revenue <span class="text-primary">Pipeline</span></h2>
+                <button onclick="renderDeposits('pending')" class="bg-primary text-white px-5 py-2.5 rounded-[15px] text-[9px] font-black uppercase tracking-widest">Pending Only</button>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-2 mb-6">
+                <button onclick="renderDeposits('pending')" id="filter-pending" class="py-2.5 bg-primary text-white rounded-[12px] font-black text-[8px] uppercase tracking-widest">Pending</button>
+                <button onclick="renderDeposits('approved')" id="filter-approved" class="py-2.5 bg-white/5 text-gray-400 rounded-[12px] font-black text-[8px] uppercase tracking-widest hover:text-green-500">Approved</button>
+                <button onclick="renderDeposits('rejected')" id="filter-rejected" class="py-2.5 bg-white/5 text-gray-400 rounded-[12px] font-black text-[8px] uppercase tracking-widest hover:text-red-500">Rejected</button>
+            </div>
+
+            <div id="deposit-list" class="space-y-4"></div>
+        </section>
+
+        <!-- Requests -->
+        <section id="page-requests" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <h2 class="text-3xl font-black uppercase text-white tracking-tighter">User <span class="text-primary">Requests</span></h2>
+                <button onclick="confirmAction('Clear all user requests?', clearAllRequests)" class="bg-red-600/10 text-red-500 border border-red-600/20 px-6 py-3 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition">Clear All</button>
+            </div>
+            
+            <div class="relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                <input type="text" id="search-requests" onkeyup="renderRequests()" placeholder="Search requests..." class="input-dark pl-12">
+            </div>
+
+            <div id="requests-list" class="space-y-4 pb-16"></div>
+        </section>
+
+        <!-- Settings -->
+        <section id="page-settings" class="hidden space-y-6">
+            <h2 class="text-3xl font-black uppercase text-white tracking-tighter">Core <span class="text-primary">Override</span></h2>
+            <div class="content-glass p-8 rounded-[35px] max-w-2xl space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-gray-500 uppercase ml-2 tracking-widest">Gateway UPI</label>
+                        <input id="set-upi" type="text" class="input-dark" placeholder="payment@upi">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-gray-500 uppercase ml-2 tracking-widest">QR Manifest URL</label>
+                        <input id="set-qr" type="text" class="input-dark" placeholder="https://cdn.link/qr.jpg">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-gray-500 uppercase ml-2 tracking-widest">Telegram Channel Link</label>
+                        <input id="set-telegram-channel" type="text" class="input-dark" placeholder="https://t.me/yourchannel">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-gray-500 uppercase ml-2 tracking-widest">Telegram Contact Link</label>
+                        <input id="set-telegram-contact" type="text" class="input-dark" placeholder="https://t.me/yourusername">
+                    </div>
+                </div>
+                
+                <div class="bg-black/50 p-6 rounded-[25px] border border-white/5">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <span class="text-[11px] font-black uppercase block text-white tracking-widest">Indo Dynamic Pricing</span>
+                            <span class="text-[9px] text-gray-500 uppercase mt-1 block font-bold">Price increases by ₹1 daily</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-primary text-lg font-black">ACTIVE</span>
+                        </div>
+                    </div>
+                    <p class="text-[9px] text-gray-400 leading-relaxed">
+                        Indo products will automatically show "1 Day Old", "2 Days Old" etc. based on upload date.<br>
+                        Price increases by ₹1 for each day after the first day.
+                    </p>
+                </div>
+                
+                <div class="flex justify-between items-center bg-black/50 p-6 rounded-[25px] border border-white/5">
+                    <div>
+                        <span class="text-[11px] font-black uppercase block text-white tracking-widest">System Lockdown</span>
+                        <span class="text-[9px] text-gray-500 uppercase mt-1 block font-bold">Restrict all user traffic</span>
+                    </div>
+                    <label class="switch"><input type="checkbox" id="set-maint"><span class="slider"></span></label>
+                </div>
+                <button onclick="saveSettings()" class="w-full bg-primary py-4 rounded-[20px] font-black uppercase text-[11px] tracking-[0.3em] shadow-2xl">Deploy Changes</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Product Modal -->
+    <div id="modal-product" class="fixed inset-0 z-[5000] bg-black/95 backdrop-blur-3xl hidden items-center justify-center p-4">
+        <div class="content-glass w-full max-w-2xl rounded-[50px] p-10 space-y-6 overflow-y-auto max-h-[90vh] border border-white/10">
+            <div class="flex justify-between items-center">
+                <h3 id="p-modal-title" class="text-2xl font-black uppercase text-white tracking-tighter">Asset Entry</h3>
+                <button onclick="closeModal('modal-product')" class="text-gray-500 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <input type="hidden" id="p-id">
+            
+            <!-- Category Boxes -->
+            <div class="space-y-2">
+                <label class="text-[9px] font-black text-gray-500 uppercase ml-2 tracking-[0.2em]">Select Asset Classification</label>
+                <div class="category-boxes" id="type-selector-grid">
+                    <div onclick="selectProductType('indo', this)" class="category-box active" data-type="indo">
+                        <i class="fa-brands fa-instagram"></i>
+                        <span>Indo</span>
+                    </div>
+                    <div onclick="selectProductType('cc', this)" class="category-box" data-type="cc">
+                        <i class="fa-solid fa-credit-card"></i>
+                        <span>CC's</span>
+                    </div>
+                    <div onclick="selectProductType('method', this)" class="category-box" data-type="method">
+                        <i class="fa-solid fa-fire"></i>
+                        <span>Method</span>
+                    </div>
+                    <div onclick="selectProductType('bin', this)" class="category-box" data-type="bin">
+                        <i class="fa-solid fa-microchip"></i>
+                        <span>Bin</span>
+                    </div>
+                    <div onclick="selectProductType('paynow', this)" class="category-box" data-type="paynow">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Pay Now</span>
+                    </div>
+                    <div onclick="selectProductType('other', this)" class="category-box" data-type="other">
+                        <i class="fa-solid fa-box"></i>
+                        <span>Other</span>
+                    </div>
+                </div>
+                <input type="hidden" id="p-type" value="indo">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black text-gray-500 uppercase ml-2 tracking-widest">Display Title</label>
+                    <input id="p-title" type="text" class="input-dark" placeholder="e.g. Premium Account">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-gray-500 uppercase ml-2 tracking-widest">Base Price</label>
+                        <input id="p-price" type="number" class="input-dark" placeholder="₹" value="100">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black text-gray-500 uppercase ml-2 tracking-widest">Available</label>
+                        <input id="p-stock" type="number" class="input-dark" placeholder="Qty" value="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[9px] font-black text-gray-500 uppercase ml-2 tracking-widest">Asset Description</label>
+                <textarea id="p-desc" class="input-dark h-20" placeholder="Briefly describe the product..."></textarea>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[9px] font-black text-primary uppercase ml-2 tracking-widest">Encrypted Delivery Data</label>
+                <textarea id="p-data" class="input-dark h-28 border-dashed border-primary/30 font-mono text-xs" placeholder="Accounts, Keys, or Redirection Links..."></textarea>
+            </div>
+
+            <div id="indo-dynamic-info" class="bg-primary/5 border border-primary/10 p-4 rounded-xl hidden">
+                <div class="flex items-center gap-2 mb-1">
+                    <i class="fa-solid fa-clock-rotate-left text-primary"></i>
+                    <p class="text-[9px] font-black text-primary uppercase">Indo Dynamic Pricing Active</p>
+                </div>
+                <p class="text-[8px] text-gray-400 leading-relaxed">
+                    • This product will show "1 Day Old", "2 Days Old" etc. based on upload date<br>
+                    • Price will increase by ₹1 for each day after the first day<br>
+                    • Example: Base ₹100 + 3 days old = ₹103
+                </p>
+            </div>
+
+            <div class="flex gap-3 pt-3">
+                <button onclick="closeModal('modal-product')" class="flex-1 py-4 bg-white/5 rounded-[20px] font-bold uppercase text-[9px] tracking-widest border border-white/5">Discard</button>
+                <button onclick="saveProduct()" class="flex-1 py-4 bg-primary rounded-[20px] font-black uppercase text-[9px] tracking-widest shadow-2xl shadow-red-500/30">Save Asset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Login/Signup Screen -->
+    <div id="auth-screen" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="text-4xl font-black uppercase tracking-tighter mb-2">
+                    <span class="text-primary">NECXY</span>
+                    <span class="text-white">PRO</span>
+                </h1>
+                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[4px]">Elite Admin Console</p>
+                <p class="text-[9px] text-gray-600 mt-2 font-bold">SECURE ACCESS PANEL v2.0</p>
+            </div>
+            
+            <div class="login-body">
+                <div class="auth-tabs">
+                    <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
+                    <div class="auth-tab" onclick="switchAuthTab('signup')">Create Admin</div>
+                </div>
+                
+                <!-- Login Form -->
+                <div id="login-form" class="auth-form">
+                    <div class="input-group">
+                        <label>Admin Email</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-user-shield"></i>
+                            <input type="email" id="auth-email" placeholder="admin@necxy.com" autocomplete="username">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="auth-pass" placeholder="••••••••" autocomplete="current-password">
+                        </div>
+                    </div>
+                    
+                    <button onclick="handleAuth()" id="auth-btn" class="btn-primary">
+                        <span id="auth-btn-text">Login to Admin Panel</span>
+                    </button>
+                </div>
+                
+                <!-- Simple Signup Form -->
+                <div id="signup-form" class="auth-form hidden">
+                    <div class="input-group">
+                        <label>Admin Name</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-id-card"></i>
+                            <input type="text" id="auth-name" placeholder="Enter admin display name">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Admin Email</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-envelope"></i>
+                            <input type="email" id="signup-email" placeholder="secure@admin.com">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="signup-pass" placeholder="Minimum 8 characters">
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Confirm Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock"></i>
+                            <input type="password" id="signup-confirm" placeholder="Re-enter password">
+                        </div>
+                    </div>
+                    
+                    <button onclick="handleSignup()" id="signup-btn" class="btn-primary btn-green">
+                        <span id="signup-btn-text">Create Admin Account</span>
+                    </button>
+                    
+                    <p class="admin-secret-note">
+                        <i class="fa-solid fa-triangle-exclamation mr-1"></i> Admin accounts have full system access
+                    </p>
+                </div>
+            </div>
+            
+            <div class="login-footer">
+                <p class="text-[9px] text-gray-600 font-bold">© 2024 NECXY PRO | ELITE ADMIN SYSTEM v2.0</p>
+                <p class="text-[8px] text-gray-700 mt-2">All activities are logged and monitored</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set, update, remove, push, runTransaction, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCJmwYY_s9dYFR5uCf4CHyaVG2ljwGAC2E",
+            authDomain: "minespro-4267c.firebaseapp.com",
+            projectId: "minespro-4267c",
+            storageBucket: "minespro-4267c.firebasestorage.app",
+            messagingSenderId: "747684645622",
+            appId: "1:747684645622:web:e9a0415c87a992f3d7bad7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        let users = {}, products = {}, deposits = {}, requests = {}, selectedUID = null, settings = {};
+        let currentDepositFilter = 'pending';
+        let currentProductFilter = 'all';
+
+        // Auth Tab Switching
+        window.switchAuthTab = (tab) => {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.add('hidden'));
+            
+            if(tab === 'login') {
+                document.querySelector('.auth-tab:nth-child(1)').classList.add('active');
+                document.getElementById('login-form').classList.remove('hidden');
+            } else {
+                document.querySelector('.auth-tab:nth-child(2)').classList.add('active');
+                document.getElementById('signup-form').classList.remove('hidden');
+            }
+        };
+
+        // Simple Signup
+        window.handleSignup = async () => {
+            const name = document.getElementById('auth-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-pass').value;
+            const confirm = document.getElementById('signup-confirm').value;
+            
+            if(!name || !email || !password || !confirm) {
+                showToast("Fill all fields", 'error');
+                return;
+            }
+            
+            if(password !== confirm) {
+                showToast("Passwords don't match", 'error');
+                return;
+            }
+            
+            if(password.length < 8) {
+                showToast("Password must be at least 8 characters", 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('signup-btn');
+            const btnText = document.getElementById('signup-btn-text');
+            const originalText = btnText.innerText;
+            btnText.innerHTML = '<span class="loader mr-2"></span> Creating Admin...';
+            btn.disabled = true;
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                
+                // Create admin user in database
+                await set(ref(db, `users/${userCredential.user.uid}`), {
+                    name: name,
+                    email: email,
+                    balance: 0,
+                    displayId: Math.floor(100000 + Math.random() * 900000),
+                    isAdmin: true,
+                    isHidden: true,
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString()
+                });
+                
+                showToast("Admin account created successfully!");
+                switchAuthTab('login');
+            } catch (error) {
+                btnText.innerText = originalText;
+                btn.disabled = false;
+                if(error.code === 'auth/email-already-in-use') {
+                    showToast("Email already registered", 'error');
+                } else {
+                    showToast("Signup failed: " + error.message, 'error');
+                }
+            }
+        };
+
+        // Handle Login
+        window.handleAuth = async () => {
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-pass').value;
+            
+            if(!email || !password) {
+                showToast("Enter email and password", 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('auth-btn');
+            const btnText = document.getElementById('auth-btn-text');
+            const originalText = btnText.innerText;
+            btnText.innerHTML = '<span class="loader mr-2"></span> Authenticating...';
+            btn.disabled = true;
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showToast("Access Granted - Welcome Back");
+            } catch (error) {
+                btnText.innerText = originalText;
+                btn.disabled = false;
+                showToast("Invalid credentials", 'error');
+            }
+        };
+
+        window.logoutAdmin = () => signOut(auth);
+
+        onAuthStateChanged(auth, user => {
+            if(user) { 
+                document.getElementById('auth-screen').classList.add('hidden'); 
+                initSync(); 
+            } else { 
+                document.getElementById('auth-screen').classList.remove('hidden'); 
+            }
+        });
+
+        function initSync() {
+            // Listen to users
+            onValue(ref(db, 'users'), s => { 
+                const data = s.val();
+                users = {};
+                if(data) {
+                    Object.entries(data).forEach(([key, value]) => {
+                        if(value && typeof value === 'object') {
+                            // Only show non-hidden users in the list (except for current admin)
+                            if(!value.isHidden || key === auth.currentUser?.uid) {
+                                users[key] = value;
+                            }
+                        }
+                    });
+                }
+                renderUsers(); 
+                renderOrders(); 
+                updateStats(); 
+            });
+            
+            // Listen to products
+            onValue(ref(db, 'products'), s => { 
+                const data = s.val();
+                products = {};
+                if(data) {
+                    if(Array.isArray(data)) {
+                        products = data.reduce((acc, item, index) => {
+                            if(item) {
+                                acc[index] = { ...item, id: index.toString() };
+                            }
+                            return acc;
+                        }, {});
+                    } else {
+                        products = Object.entries(data).reduce((acc, [key, value]) => {
+                            if(value && typeof value === 'object') {
+                                acc[key] = { ...value, id: key };
+                            }
+                            return acc;
+                        }, {});
+                    }
+                } else {
+                    products = {};
+                }
+                renderProducts(); 
+            });
+            
+            // Listen to deposits - FIXED
+            onValue(ref(db, 'deposits'), s => { 
+                const data = s.val();
+                deposits = {};
+                if(data) {
+                    if(Array.isArray(data)) {
+                        data.forEach((item, index) => {
+                            if(item && typeof item === 'object') {
+                                deposits[index] = { ...item, id: index.toString() };
+                            }
+                        });
+                    } else {
+                        Object.entries(data).forEach(([key, value]) => {
+                            if(value && typeof value === 'object') {
+                                deposits[key] = { ...value, id: key };
+                            }
+                        });
+                    }
+                }
+                console.log("Deposits loaded:", deposits);
+                renderDeposits(); 
+                updateStats(); 
+            });
+            
+            // Listen to requests
+            onValue(ref(db, 'requests'), s => { 
+                const data = s.val();
+                requests = {};
+                if(data) {
+                    Object.entries(data).forEach(([key, value]) => {
+                        if(value && typeof value === 'object') {
+                            requests[key] = { ...value, id: key };
+                        }
+                    });
+                }
+                renderRequests(); 
+                updateStats(); 
+            });
+            
+            // Listen to settings
+            onValue(ref(db, 'settings'), s => {
+                settings = s.val() || {};
+                document.getElementById('set-upi').value = settings.upi || '';
+                document.getElementById('set-qr').value = settings.qrLink || '';
+                document.getElementById('set-telegram-channel').value = settings.telegramChannel || '';
+                document.getElementById('set-telegram-contact').value = settings.telegramContact || '';
+                document.getElementById('set-maint').checked = settings.isMaintenance || false;
+            });
+        }
+
+        // Inventory Filtering
+        window.filterProducts = (category) => {
+            currentProductFilter = category;
+            
+            // Update active button
+            document.querySelectorAll('.inventory-nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Find and activate the clicked button
+            const buttons = document.querySelectorAll('.inventory-nav-btn');
+            buttons.forEach(btn => {
+                if(btn.textContent.toLowerCase().includes(category) || 
+                   (category === 'all' && btn.classList.contains('nav-btn-all'))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            renderProducts();
+        };
+
+        // Product Category Selection
+        window.selectProductType = (val, el) => {
+            document.querySelectorAll('.category-box').forEach(box => box.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('p-type').value = val;
+            
+            // Show/hide Indo dynamic pricing info
+            const indoInfo = document.getElementById('indo-dynamic-info');
+            if(val === 'indo') {
+                indoInfo.classList.remove('hidden');
+            } else {
+                indoInfo.classList.add('hidden');
+            }
+        };
+
+        function calculateProductAgeAndPrice(product) {
+            if(!product || !product.addedOn) return { ageText: null, finalPrice: product?.price || 0 };
+            
+            try {
+                const uploadDate = new Date(product.addedOn);
+                const now = new Date();
+                const diffTime = Math.abs(now - uploadDate);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                let ageText = null;
+                let finalPrice = parseInt(product.price) || 0;
+                
+                // Only for Indo products
+                if(product.type && product.type.toLowerCase() === 'indo') {
+                    if(diffDays >= 1) {
+                        ageText = `${diffDays} Day${diffDays > 1 ? 's' : ''} Old`;
+                        // Add ₹1 for each day after the first day
+                        if(diffDays >= 1) {
+                            finalPrice += diffDays;
+                        }
+                    }
+                }
+                
+                return { ageText, finalPrice };
+            } catch(e) {
+                console.error("Error calculating product age:", e);
+                return { ageText: null, finalPrice: product?.price || 0 };
+            }
+        }
+
+        function getFormattedDate(dateString) {
+            if(!dateString) return "No Date";
+            try {
+                const date = new Date(dateString);
+                if(isNaN(date.getTime())) return dateString;
+                
+                const day = date.getDate();
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                return `${day} ${months[date.getMonth()]} ${date.getFullYear()} ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+            } catch(e) {
+                return dateString;
+            }
+        }
+
+        function updateStats() {
+            const visibleUsers = Object.values(users).filter(u => !u.isHidden);
+            document.getElementById('stat-users').innerText = visibleUsers.length;
+            
+            let total = 0; 
+            Object.values(users).forEach(u => total += (u.balance || 0));
+            document.getElementById('stat-balance').innerText = '₹' + total;
+            
+            const pendingRequests = Object.values(deposits).filter(d => 
+                d.status === 'Processing' || !d.status || d.status === 'Pending'
+            ).length;
+            document.getElementById('stat-requests').innerText = pendingRequests;
+        }
+
+        window.renderUsers = () => {
+            const q = document.getElementById('search-user')?.value.toLowerCase() || '';
+            const container = document.getElementById('users-grid');
+            let html = '';
+            
+            Object.entries(users).forEach(([uid, u]) => {
+                if(!u || typeof u !== 'object') return;
+                
+                // Skip hidden admins in user list
+                if(u.isHidden && uid !== auth.currentUser?.uid) return;
+                
+                const displayId = u.displayId || uid.substring(0, 6);
+                const name = u.name || 'Anonymous Member';
+                const email = u.email || '';
+                
+                if(name.toLowerCase().includes(q) || 
+                   displayId.toString().toLowerCase().includes(q) || 
+                   email.toLowerCase().includes(q)) {
+                    const isCurrentUser = uid === auth.currentUser?.uid;
+                    
+                    html += `
+                        <div onclick="openUserModal('${uid}')" class="content-glass p-6 rounded-[35px] border border-white/5 flex justify-between items-center cursor-pointer neo-card ${isCurrentUser ? 'border-primary/30' : ''}">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-2xl ${u.isAdmin ? 'bg-primary/10' : 'bg-gray-500/10'} flex items-center justify-center font-black ${u.isAdmin ? 'text-primary' : 'text-gray-500'} border ${u.isAdmin ? 'border-primary/20' : 'border-gray-500/20'} text-lg">
+                                    ${(name[0] || 'U').toUpperCase()}
+                                    ${u.isAdmin ? '<i class="fa-solid fa-crown absolute -top-1 -right-1 text-xs text-primary"></i>' : ''}
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-black text-white uppercase truncate w-28 tracking-tighter">${name}</h4>
+                                    <p class="text-[8px] font-mono text-gray-600 uppercase tracking-widest mt-1 italic">UID: ${displayId}</p>
+                                    ${email ? `<p class="text-[8px] text-gray-700 truncate w-28 mt-1">${email}</p>` : ''}
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-black ${u.isBanned ? 'text-red-500' : u.isAdmin ? 'text-primary' : 'text-green-500'} text-md italic">₹${u.balance || 0}</p>
+                                ${u.isAdmin ? `<p class="text-[8px] text-primary uppercase font-bold mt-1">Admin</p>` : ''}
+                                ${u.isBanned ? `<p class="text-[8px] text-red-500 uppercase font-bold mt-1">Banned</p>` : ''}
+                            </div>
+                        </div>`;
+                }
+            });
+            
+            container.innerHTML = html || '<div class="col-span-full py-16 text-center opacity-10 font-black uppercase tracking-[1em]">Empty Registry</div>';
+        };
+
+        // COMPACT PRODUCT RENDERING
+        window.renderProducts = () => {
+            const q = document.getElementById('search-products')?.value.toLowerCase() || '';
+            const container = document.getElementById('products-list');
+            
+            // Filter products based on current filter
+            let filteredProducts = Object.entries(products);
+            
+            if(currentProductFilter !== 'all') {
+                filteredProducts = filteredProducts.filter(([pid, p]) => {
+                    if(!p || typeof p !== 'object') return false;
+                    return p.type?.toLowerCase() === currentProductFilter;
+                });
+            }
+            
+            // Filter by search query
+            filteredProducts = filteredProducts.filter(([pid, p]) => {
+                if(!p || typeof p !== 'object') return false;
+                
+                const titleMatch = p.title?.toLowerCase().includes(q);
+                const descMatch = p.desc?.toLowerCase().includes(q);
+                const typeMatch = p.type?.toLowerCase().includes(q);
+                
+                return titleMatch || descMatch || typeMatch;
+            });
+            
+            if(filteredProducts.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-16 text-center">
+                        <div class="w-16 h-16 bg-gray-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-box-open text-2xl text-gray-500"></i>
+                        </div>
+                        <p class="text-gray-500 font-black uppercase tracking-[0.3em] text-sm">No assets found</p>
+                        <p class="text-gray-600 text-[10px] mt-2">Try changing filters or search query</p>
+                    </div>`;
+                return;
+            }
+            
+            let html = '';
+            
+            filteredProducts.forEach(([pid, p]) => {
+                if(!p || typeof p !== 'object') return;
+                
+                const { ageText, finalPrice } = calculateProductAgeAndPrice(p);
+                const basePrice = p.price || 0;
+                const type = p.type || 'other';
+                
+                html += `
+                    <div class="compact-product-card" data-type="${type}">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="category-tag tag-${type}">${type}</span>
+                                ${ageText ? `<span class="text-[8px] text-yellow-500 font-black uppercase tracking-widest ml-2">${ageText}</span>` : ''}
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editProd('${pid}')" class="text-blue-500 hover:scale-110 transition text-sm"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteProduct('${pid}')" class="text-red-500 hover:scale-110 transition text-sm"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <h3 class="font-black text-white text-md uppercase truncate mb-2 tracking-tighter">${p.title || 'No Title'}</h3>
+                        <p class="text-gray-400 text-xs mb-4 line-clamp-2 flex-grow">${p.desc || 'No description'}</p>
+                        
+                        <div class="mt-auto">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-[9px] text-gray-500 uppercase font-bold">Price</p>
+                                    <p class="text-lg font-black text-white">₹${finalPrice}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[9px] text-gray-500 uppercase font-bold">Stock</p>
+                                    <p class="text-[9px] font-black ${p.stock > 0 ? 'text-green-500' : 'text-red-500'} uppercase">${p.stock || 0} Left</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            
+            container.innerHTML = html;
+        };
+
+        window.deleteProduct = (pid) => {
+            confirmAction('Are you sure you want to delete this product?', () => {
+                remove(ref(db, `products/${pid}`)).then(() => {
+                    showToast("Product deleted successfully");
+                    setTimeout(() => renderProducts(), 500);
+                }).catch(error => {
+                    showToast("Failed to delete product", 'error');
+                });
+            });
+        };
+
+        window.openProductModal = () => {
+            document.getElementById('p-id').value = '';
+            document.getElementById('p-modal-title').innerText = "Add New Product";
+            document.getElementById('p-title').value = '';
+            document.getElementById('p-price').value = '100';
+            document.getElementById('p-stock').value = '1';
+            document.getElementById('p-desc').value = '';
+            document.getElementById('p-data').value = '';
+            
+            const defaultType = 'indo';
+            document.getElementById('p-type').value = defaultType;
+            document.querySelectorAll('.category-box').forEach(box => {
+                box.classList.remove('active');
+                if(box.getAttribute('data-type') === defaultType) {
+                    box.classList.add('active');
+                }
+            });
+            
+            // Show Indo dynamic pricing info by default
+            document.getElementById('indo-dynamic-info').classList.remove('hidden');
+            
+            openModal('modal-product');
+        };
+
+        window.editProd = (pid) => {
+            const p = products[pid];
+            if(!p) return;
+            
+            document.getElementById('p-id').value = pid;
+            document.getElementById('p-title').value = p.title || '';
+            document.getElementById('p-price').value = p.price || '';
+            document.getElementById('p-stock').value = p.stock || 0;
+            document.getElementById('p-desc').value = p.desc || '';
+            document.getElementById('p-data').value = p.data || '';
+            document.getElementById('p-modal-title').innerText = "Edit Product";
+            
+            const type = p.type || 'indo';
+            document.getElementById('p-type').value = type;
+            
+            document.querySelectorAll('.category-box').forEach(box => {
+                box.classList.remove('active');
+                if(box.getAttribute('data-type') === type) {
+                    box.classList.add('active');
+                }
+            });
+            
+            // Show/hide Indo dynamic pricing info
+            const indoInfo = document.getElementById('indo-dynamic-info');
+            if(type === 'indo') {
+                indoInfo.classList.remove('hidden');
+            } else {
+                indoInfo.classList.add('hidden');
+            }
+            
+            openModal('modal-product');
+        };
+
+        window.saveProduct = () => {
+            const id = document.getElementById('p-id').value;
+            const title = document.getElementById('p-title').value.trim();
+            const price = parseInt(document.getElementById('p-price').value);
+            const stock = parseInt(document.getElementById('p-stock').value);
+            const type = document.getElementById('p-type').value;
+            const desc = document.getElementById('p-desc').value.trim();
+            const data = document.getElementById('p-data').value.trim();
+            
+            if(!title) {
+                showToast("Product title is required", 'error');
+                return;
+            }
+            
+            if(!price || price <= 0) {
+                showToast("Valid price is required", 'error');
+                return;
+            }
+            
+            if(!stock || stock < 0) {
+                showToast("Valid stock quantity is required", 'error');
+                return;
+            }
+            
+            const productData = {
+                title,
+                price,
+                stock,
+                type,
+                desc,
+                data,
+                addedOn: new Date().toISOString()
+            };
+            
+            const btn = document.querySelector('#modal-product button:last-child');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<span class="loader"></span>';
+            btn.disabled = true;
+            
+            if(id) {
+                update(ref(db, `products/${id}`), productData).then(() => {
+                    showToast("Product updated successfully");
+                    closeModal('modal-product');
+                    setTimeout(() => renderProducts(), 500);
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }).catch(error => {
+                    showToast("Failed to update product", 'error');
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                });
+            } else {
+                const newProductRef = push(ref(db, 'products'));
+                set(newProductRef, productData).then(() => {
+                    showToast("Product added successfully");
+                    closeModal('modal-product');
+                    setTimeout(() => renderProducts(), 500);
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }).catch(error => {
+                    showToast("Failed to add product", 'error');
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                });
+            }
+        };
+
+        // FIXED DEPOSIT RENDERING
+        window.renderDeposits = (filter = 'pending') => {
+            currentDepositFilter = filter;
+            
+            // Update filter button styles
+            document.querySelectorAll('#page-deposits .grid button').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-white/5', 'text-gray-400');
+            });
+            
+            const activeBtn = document.getElementById(`filter-${filter}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-white/5', 'text-gray-400');
+                activeBtn.classList.add('bg-primary', 'text-white');
+            }
+            
+            const container = document.getElementById('deposit-list');
+            let html = '';
+            
+            const allDeposits = Object.values(deposits);
+            console.log("All deposits:", allDeposits);
+            
+            if(allDeposits.length === 0) {
+                container.innerHTML = '<div class="py-16 text-center opacity-10 font-black uppercase tracking-[1em]">No deposit requests</div>';
+                return;
+            }
+            
+            // Filter deposits
+            let filteredDeposits = allDeposits;
+            if(filter === 'pending') {
+                filteredDeposits = allDeposits.filter(d => 
+                    !d.status || d.status === 'Processing' || d.status === 'Pending'
+                );
+            } else if(filter === 'approved') {
+                filteredDeposits = allDeposits.filter(d => d.status === 'Approved' || d.status === 'Completed');
+            } else if(filter === 'rejected') {
+                filteredDeposits = allDeposits.filter(d => d.status === 'Rejected');
+            }
+            
+            console.log("Filtered deposits:", filteredDeposits);
+            
+            // Sort by date (newest first)
+            filteredDeposits.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+            
+            filteredDeposits.forEach(d => {
+                if(!d || typeof d !== 'object') return;
+                
+                const user = users[d.uid];
+                const userName = user?.name || d.userName || 'Unknown User';
+                const userDisplayId = user?.displayId || d.uid?.substring(0, 6) || 'N/A';
+                const amount = d.amount || 0;
+                const status = d.status || 'Processing';
+                const date = d.date ? new Date(d.date).toLocaleString() : 'Unknown date';
+                const utr = d.utr || 'No UTR';
+                const depositId = d.id || '';
+                
+                let statusColor = 'text-yellow-500';
+                let statusText = 'Pending';
+                let statusBg = 'bg-yellow-500/10';
+                
+                if(status === 'Approved' || status === 'Completed') {
+                    statusColor = 'text-green-500';
+                    statusText = 'Approved';
+                    statusBg = 'bg-green-500/10';
+                } else if(status === 'Rejected') {
+                    statusColor = 'text-red-500';
+                    statusText = 'Rejected';
+                    statusBg = 'bg-red-500/10';
+                }
+                
+                html += `
+                    <div class="content-glass p-6 rounded-[35px] border border-white/5 neo-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 rounded-xl ${statusBg} flex items-center justify-center ${statusColor}">
+                                        <i class="fa-solid fa-indian-rupee-sign"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-lg font-black text-white uppercase italic tracking-tighter">${userName}</p>
+                                        <p class="text-[9px] text-gray-500 font-mono mt-1 uppercase">UID: ${userDisplayId}</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[9px] text-gray-500 uppercase font-bold">UTR / Reference</span>
+                                        <span class="text-[9px] font-mono text-primary bg-primary/5 px-2 py-1 rounded-full">${utr}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[9px] text-gray-500 uppercase font-bold">Date</span>
+                                        <span class="text-[9px] text-white">${date}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right ml-4">
+                                <p class="text-3xl font-black text-white italic">₹${amount}</p>
+                                <p class="text-[9px] ${statusColor} font-black uppercase mt-1 bg-black/30 px-2 py-1 rounded-full">${statusText}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pt-3 border-t border-white/5">
+                            ${status === 'Processing' || status === 'Pending' || !status ? `
+                                <button onclick="procDep('${depositId}', '${d.uid}', ${amount}, true)" class="flex-1 bg-green-600 py-2.5 rounded-[18px] font-black uppercase text-[9px] tracking-widest shadow-xl shadow-green-500/20 hover:bg-green-700 transition">✓ Approve</button>
+                                <button onclick="procDep('${depositId}', '${d.uid}', ${amount}, false)" class="flex-1 bg-white/5 border border-white/10 py-2.5 rounded-[18px] font-black uppercase text-[9px] tracking-widest hover:bg-white/10 transition">✗ Reject</button>
+                            ` : ''}
+                            <button onclick="deleteDeposit('${depositId}')" class="delete-deposit-btn">
+                                <i class="fa-solid fa-trash mr-1"></i> Delete
+                            </button>
+                        </div>
+                    </div>`;
+            });
+            
+            container.innerHTML = html || '<div class="py-16 text-center opacity-10 font-black uppercase tracking-[1em]">No deposits found</div>';
+        };
+
+        window.deleteDeposit = (did) => {
+            confirmAction('Delete this deposit record permanently?', () => {
+                remove(ref(db, `deposits/${did}`)).then(() => {
+                    showToast("Deposit record deleted");
+                    setTimeout(() => renderDeposits(currentDepositFilter), 500);
+                }).catch(error => {
+                    showToast("Error deleting deposit", 'error');
+                });
+            });
+        };
+
+        window.procDep = (did, uid, amt, approve) => {
+            if(!did || !uid) return;
+            
+            if(approve) {
+                runTransaction(ref(db, `users/${uid}/balance`), (b) => {
+                    return (b || 0) + amt;
+                }).then(() => {
+                    update(ref(db, `deposits/${did}`), { 
+                        status: 'Approved',
+                        processedAt: new Date().toLocaleString()
+                    }).then(() => {
+                        showToast("Deposit approved and balance added");
+                        setTimeout(() => renderDeposits(currentDepositFilter), 500);
+                    });
+                }).catch(error => {
+                    showToast("Error approving deposit", 'error');
+                });
+            } else {
+                update(ref(db, `deposits/${did}`), { 
+                    status: 'Rejected',
+                    processedAt: new Date().toLocaleString()
+                }).then(() => {
+                    showToast("Deposit rejected");
+                    setTimeout(() => renderDeposits(currentDepositFilter), 500);
+                }).catch(error => {
+                    showToast("Error rejecting deposit", 'error');
+                });
+            }
+        };
+
+        // User Requests Management
+        window.renderRequests = () => {
+            const q = document.getElementById('search-requests')?.value.toLowerCase() || '';
+            const container = document.getElementById('requests-list');
+            
+            const allRequests = Object.values(requests);
+            if(allRequests.length === 0) {
+                container.innerHTML = '<div class="py-16 text-center opacity-10 font-black uppercase tracking-[1em]">No requests from users</div>';
+                return;
+            }
+            
+            // Sort by date (newest first)
+            allRequests.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+            
+            let html = '';
+            
+            allRequests.forEach(r => {
+                if(!r || typeof r !== 'object') return;
+                
+                const user = users[r.uid];
+                const userName = user?.name || 'Unknown User';
+                const userDisplayId = user?.displayId || r.uid?.substring(0, 6) || 'N/A';
+                const requestText = r.text || 'No message';
+                const date = r.date ? new Date(r.date).toLocaleString() : 'Unknown date';
+                const requestId = r.id || '';
+                
+                if(!requestText.toLowerCase().includes(q)) return;
+                
+                html += `
+                    <div class="content-glass p-6 rounded-[35px] border border-white/5 neo-card">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+                                        <i class="fa-solid fa-comment"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-lg font-black text-white uppercase italic tracking-tighter">${userName}</p>
+                                        <p class="text-[9px] text-gray-500 font-mono mt-1 uppercase">UID: ${userDisplayId}</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[9px] text-gray-500 uppercase font-bold">Request</span>
+                                        <span class="text-[9px] text-white font-bold">${date}</span>
+                                    </div>
+                                    <div class="bg-black/30 p-3 rounded-xl mt-2">
+                                        <p class="text-sm text-gray-300 leading-relaxed">${requestText}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pt-3 border-t border-white/5">
+                            <button onclick="deleteRequest('${requestId}')" class="flex-1 bg-red-600/10 text-red-500 py-2.5 rounded-[18px] font-black uppercase text-[9px] tracking-widest hover:bg-red-600 hover:text-white transition">Delete</button>
+                            <button onclick="markAsDone('${requestId}')" class="flex-1 bg-green-600/10 text-green-500 py-2.5 rounded-[18px] font-black uppercase text-[9px] tracking-widest hover:bg-green-600 hover:text-white transition">Mark Done</button>
+                        </div>
+                    </div>`;
+            });
+            
+            container.innerHTML = html || '<div class="py-16 text-center opacity-10 font-black uppercase tracking-[1em]">No requests found</div>';
+        };
+
+        window.deleteRequest = (requestId) => {
+            confirmAction('Delete this user request?', () => {
+                remove(ref(db, `requests/${requestId}`)).then(() => {
+                    showToast("Request deleted");
+                    setTimeout(() => renderRequests(), 500);
+                }).catch(error => {
+                    showToast("Error deleting request", 'error');
+                });
+            });
+        };
+
+        window.markAsDone = (requestId) => {
+            confirmAction('Mark this request as completed?', () => {
+                update(ref(db, `requests/${requestId}`), { 
+                    status: 'Completed',
+                    completedAt: new Date().toLocaleString()
+                }).then(() => {
+                    showToast("Request marked as completed");
+                    setTimeout(() => renderRequests(), 500);
+                }).catch(error => {
+                    showToast("Error updating request", 'error');
+                });
+            });
+        };
+
+        window.clearAllRequests = () => {
+            confirmAction('Clear all user requests? This cannot be undone.', () => {
+                remove(ref(db, 'requests')).then(() => {
+                    showToast("All requests cleared");
+                    setTimeout(() => renderRequests(), 500);
+                }).catch(error => {
+                    showToast("Error clearing requests", 'error');
+                });
+            });
+        };
+
+        window.saveSettings = () => {
+            const upi = document.getElementById('set-upi').value.trim();
+            const qrLink = document.getElementById('set-qr').value.trim();
+            const telegramChannel = document.getElementById('set-telegram-channel').value.trim();
+            const telegramContact = document.getElementById('set-telegram-contact').value.trim();
+            const isMaintenance = document.getElementById('set-maint').checked;
+            
+            const settingsData = {
+                upi: upi,
+                qrLink: qrLink,
+                telegramChannel: telegramChannel,
+                telegramContact: telegramContact,
+                isMaintenance: isMaintenance
+            };
+            
+            const btn = document.querySelector('#page-settings button:last-child');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<span class="loader"></span>';
+            btn.disabled = true;
+            
+            update(ref(db, 'settings'), settingsData).then(() => {
+                showToast("Settings saved successfully");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }).catch(error => {
+                showToast("Failed to save settings", 'error');
+                btn.innerText = originalText;
+                btn.disabled = false;
+            });
+        };
+
+        window.switchTab = (id) => {
+            document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`page-${id}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`nav-${id}`).classList.add('active');
+            
+            if(window.innerWidth < 768) {
+                toggleSidebar();
+            }
+            
+            if(id === 'products') {
+                setTimeout(() => {
+                    renderProducts();
+                    // Reset to all view
+                    filterProducts('all');
+                }, 100);
+            }
+            if(id === 'orders') setTimeout(() => renderOrders(), 100);
+            if(id === 'users') setTimeout(() => renderUsers(), 100);
+            if(id === 'deposits') setTimeout(() => renderDeposits(currentDepositFilter), 100);
+            if(id === 'requests') setTimeout(() => renderRequests(), 100);
+        };
+
+        window.toggleSidebar = () => {
+            const s = document.getElementById('main-sidebar');
+            s.classList.toggle('sidebar-mobile-hidden');
+            s.classList.toggle('sidebar-mobile-show');
+        };
+
+        window.openModal = (id) => {
+            document.getElementById(id).classList.remove('hidden');
+            document.getElementById(id).classList.add('flex');
+        };
+
+        window.closeModal = (id) => {
+            document.getElementById(id).classList.remove('flex');
+            document.getElementById(id).classList.add('hidden');
+        };
+
+        function showToast(message, type = 'success') {
+            const toastArea = document.getElementById('toast-area');
+            const toast = document.createElement('div');
+            toast.className = `content-glass px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-3xl animate-slide-in toast-${type}`;
+            
+            let icon = 'fa-circle-check';
+            if(type === 'error') icon = 'fa-circle-exclamation';
+            if(type === 'warning') icon = 'fa-triangle-exclamation';
+            if(type === 'info') icon = 'fa-circle-info';
+            
+            toast.innerHTML = `<i class="fa-solid ${icon} mr-2"></i> ${message}`;
+            toastArea.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        let alertCb = null;
+        window.confirmAction = (message, callback) => {
+            document.getElementById('alert-msg').innerText = message;
+            alertCb = callback;
+            document.getElementById('custom-alert').style.display = 'flex';
+        };
+        
+        document.getElementById('alert-confirm-btn').onclick = () => {
+            if(alertCb) {
+                alertCb();
+                closeAlert();
+            }
+        };
+        
+        window.closeAlert = () => {
+            document.getElementById('custom-alert').style.display = 'none';
+        };
+
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('live-date').innerText = now.toLocaleDateString();
+            document.getElementById('live-clock').innerText = now.toLocaleTimeString();
+        }, 1000);
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            const clock = document.getElementById('live-clock');
+            const date = document.getElementById('live-date');
+            if(clock && date) {
+                const now = new Date();
+                date.innerText = now.toLocaleDateString();
+                clock.innerText = now.toLocaleTimeString();
+            }
+            
+            // Auto-switch to login tab on load
+            switchAuthTab('login');
+        });
+    </script>
+</body>
+</html>
